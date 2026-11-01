@@ -81,6 +81,7 @@ Route::middleware(['auth'])->group(function () {
 
 Route::redirect('/admin/menu_items', '/admin/menu-items');
 
+
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', Dashboard::class)->name('dashboard');
     Route::get('/orders', OrdersIndex::class)->name('orders');
