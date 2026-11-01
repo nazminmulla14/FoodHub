@@ -79,6 +79,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('logout');
 });
 
+
 Route::redirect('/admin/menu_items', '/admin/menu-items');
 
 
