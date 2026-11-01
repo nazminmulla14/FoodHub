@@ -1,0 +1,220 @@
+/* FoodHub admin — isolated from public restaurant theme (style.css) */
+
+:root {
+    --admin-sidebar-width: 260px;
+    --admin-sidebar-bg: #1e293b;
+    --admin-sidebar-text: #e2e8f0;
+    --admin-sidebar-muted: #94a3b8;
+    --admin-accent: #f97316;
+    --admin-topbar-bg: #ffffff;
+    --admin-body-bg: #f1f5f9;
+}
+
+.admin-body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--admin-body-bg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #0f172a;
+}
+
+/* Override restaurant theme if style.css is cached on admin by mistake */
+.admin-body .btn {
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 500;
+}
+
+.admin-body h1,
+.admin-body h2,
+.admin-body h3 {
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: var(--admin-sidebar-width);
+    flex-shrink: 0;
+    background: var(--admin-sidebar-bg);
+    color: var(--admin-sidebar-text);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1030;
+    overflow-y: auto;
+}
+
+.admin-sidebar-brand {
+    padding: 1.25rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar-brand span {
+    color: var(--admin-accent);
+}
+
+.admin-sidebar-nav {
+    list-style: none;
+    margin: 0;
+    padding: 1rem 0.75rem;
+    flex: 1;
+}
+
+.admin-sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.65rem 1rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.5rem;
+    color: var(--admin-sidebar-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.admin-sidebar-nav a:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+.admin-sidebar-nav a.active {
+    background: var(--admin-accent);
+    color: #fff;
+}
+
+.admin-sidebar-nav a i {
+    width: 1.25rem;
+    text-align: center;
+}
+
+.admin-sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar-footer a {
+    color: var(--admin-sidebar-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.admin-sidebar-footer a:hover {
+    color: #fff;
+}
+
+.admin-main {
+    flex: 1;
+    margin-left: var(--admin-sidebar-width);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.admin-topbar {
+    background: var(--admin-topbar-bg);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.875rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.admin-topbar-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+    color: #334155;
+}
+
+.admin-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.admin-content {
+    padding: 1.5rem;
+    flex: 1;
+}
+
+.admin-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.admin-stat-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    height: 100%;
+}
+
+.admin-stat-card .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    margin-bottom: 0.35rem;
+}
+
+.admin-stat-card .value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.admin-table-wrap {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.admin-table-wrap .table {
+    margin-bottom: 0;
+}
+
+.admin-table-wrap .table thead th {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #64748b;
+}
+
+@media (max-width: 991.98px) {
+    .admin-sidebar {
+        position: relative;
+        width: 100%;
+    }
+
+    .admin-main {
+        margin-left: 0;
+    }
+
+    .admin-wrapper {
+        flex-direction: column;
+    }
+}
