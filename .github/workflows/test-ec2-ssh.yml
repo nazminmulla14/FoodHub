@@ -77,8 +77,24 @@ jobs:
             -e "ssh -i ~/.ssh/id_ed25519 -o BatchMode=yes -o StrictHostKeyChecking=yes" \
             ./ \
             "$EC2_USER@$EC2_HOST:/var/www/foodhub/"
-
-      # 6. Install Composer dependencies
+      # 6. Prepare Laravel directories
+      - name: Prepare Laravel Directories
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$EC2_USER@$EC2_HOST" \
+            'cd /var/www/foodhub &&
+             mkdir -p storage/framework/cache/data &&
+             mkdir -p storage/framework/sessions &&
+             mkdir -p storage/framework/views &&
+             mkdir -p storage/logs &&
+             mkdir -p bootstrap/cache &&
+             chmod -R 775 storage bootstrap/cache'
+      # 7. Install Composer dependencies
       - name: Composer Install
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
@@ -90,7 +106,7 @@ jobs:
             "$EC2_USER@$EC2_HOST" \
             'cd /var/www/foodhub && composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader'
 
-      # 7. Run Laravel migrations
+      # 8. Run Laravel migrations
       - name: Run Database Migrations
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
@@ -102,7 +118,7 @@ jobs:
             "$EC2_USER@$EC2_HOST" \
             'cd /var/www/foodhub && php artisan migrate --force'
 
-      # 8. Clear Laravel caches
+      # 9. Clear Laravel caches
       - name: Clear Laravel Cache
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
@@ -114,7 +130,7 @@ jobs:
             "$EC2_USER@$EC2_HOST" \
             'cd /var/www/foodhub && php artisan optimize:clear'
 
-      # 9. Create storage link if missing
+      # 10. Create storage link if missing
       - name: Create Storage Link
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
@@ -126,7 +142,7 @@ jobs:
             "$EC2_USER@$EC2_HOST" \
             'cd /var/www/foodhub && if [ ! -L public/storage ]; then php artisan storage:link; fi'
 
-      # 10. Optimize Laravel
+      # 11. Optimize Laravel
       - name: Optimize Laravel
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
@@ -138,7 +154,7 @@ jobs:
             "$EC2_USER@$EC2_HOST" \
             'cd /var/www/foodhub && php artisan config:cache && php artisan view:cache'
 
-      # 11. Deployment completed
+      # 12. Deployment completed
       - name: Deployment Success
         run: |
           echo "Laravel deployment completed successfully!"
