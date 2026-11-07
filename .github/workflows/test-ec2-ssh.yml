@@ -3,6 +3,9 @@ name: Test EC2 SSH Connection
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      -development
 
 permissions:
   contents: read
