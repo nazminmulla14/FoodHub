@@ -76,7 +76,7 @@ jobs:
             --exclude='bootstrap/cache/' \
             -e "ssh -i ~/.ssh/id_ed25519 -o BatchMode=yes -o StrictHostKeyChecking=yes" \
             ./ \
-            "$EC2_USER@$EC2_HOST:/var/www/food_hub/"
+            "$EC2_USER@$EC2_HOST:/var/www/foodhub/"
 
       # 6. Install Composer dependencies
       - name: Composer Install
@@ -88,7 +88,7 @@ jobs:
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$EC2_USER@$EC2_HOST" \
-            'cd /var/www/food_hub && composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader'
+            'cd /var/www/foodhub && composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader'
 
       # 7. Run Laravel migrations
       - name: Run Database Migrations
@@ -100,7 +100,7 @@ jobs:
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$EC2_USER@$EC2_HOST" \
-            'cd /var/www/food_hub && php artisan migrate --force'
+            'cd /var/www/foodhub && php artisan migrate --force'
 
       # 8. Clear Laravel caches
       - name: Clear Laravel Cache
@@ -112,7 +112,7 @@ jobs:
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$EC2_USER@$EC2_HOST" \
-            'cd /var/www/food_hub && php artisan optimize:clear'
+            'cd /var/www/foodhub && php artisan optimize:clear'
 
       # 9. Create storage link if missing
       - name: Create Storage Link
@@ -124,7 +124,7 @@ jobs:
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$EC2_USER@$EC2_HOST" \
-            'cd /var/www/food_hub && if [ ! -L public/storage ]; then php artisan storage:link; fi'
+            'cd /var/www/foodhub && if [ ! -L public/storage ]; then php artisan storage:link; fi'
 
       # 10. Optimize Laravel
       - name: Optimize Laravel
@@ -136,7 +136,7 @@ jobs:
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$EC2_USER@$EC2_HOST" \
-            'cd /var/www/food_hub && php artisan config:cache && php artisan view:cache'
+            'cd /var/www/foodhub && php artisan config:cache && php artisan view:cache'
 
       # 11. Deployment completed
       - name: Deployment Success
