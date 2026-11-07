@@ -1,5 +1,5 @@
 
-name: Test EC2 SSH Connection
+name: Test EC2 SSH Connection main
 
 on:
   workflow_dispatch:
