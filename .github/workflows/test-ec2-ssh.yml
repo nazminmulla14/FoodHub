@@ -26,6 +26,13 @@ jobs:
           printf '%s\n' "$EC2_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
+          - name: Check EC2 connectivity
+            env:
+              EC2_HOST: ${{ secrets.EC2_HOST }}
+            run: |
+              echo "Testing EC2 port 22..."
+              nc -vz -w 10 "$EC2_HOST" 22
+          
       - name: Test EC2 connection
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
