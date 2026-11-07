@@ -88,12 +88,11 @@ jobs:
             -o StrictHostKeyChecking=yes \
             "$EC2_USER@$EC2_HOST" \
             'cd /var/www/foodhub &&
-             mkdir -p storage/framework/cache/data &&
-             mkdir -p storage/framework/sessions &&
-             mkdir -p storage/framework/views &&
-             mkdir -p storage/logs &&
-             mkdir -p bootstrap/cache &&
-             chmod -R 775 storage bootstrap/cache'
+             mkdir -p storage/framework/cache/data \
+                      storage/framework/sessions \
+                      storage/framework/views \
+                      storage/logs \
+                      bootstrap/cache'
       # 7. Install Composer dependencies
       - name: Composer Install
         env:
