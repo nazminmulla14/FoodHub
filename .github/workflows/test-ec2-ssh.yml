@@ -1,20 +1,38 @@
 
-name: Test EC2 SSH Connection
+name: Laravel Development CI/CD
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - development
 
+  workflow_dispatch:
+
 permissions:
   contents: read
 
+concurrency:
+  group: laravel-development-deploy
+  cancel-in-progress: false
+
 jobs:
-  test-connection:
+  deploy:
+    name: Deploy Laravel to EC2
     runs-on: ubuntu-latest
 
     steps:
+
+      # 1. Checkout latest code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Install RSYNC
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rsync openssh-client
+
+      # 3. Configure SSH
       - name: Configure SSH
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
@@ -29,15 +47,98 @@ jobs:
           printf '%s\n' "$EC2_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
-      - name: Test EC2 connection
+      # 4. Test SSH connection
+      - name: Test EC2 Connection
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
         run: |
-          ssh \
-            -i ~/.ssh/id_ed25519 \
+          ssh -i ~/.ssh/id_ed25519 \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
-            -o ConnectTimeout=10 \
             "$EC2_USER@$EC2_HOST" \
-            'echo "SSH connection successful"; whoami; hostname'
+            'echo "EC2 SSH connection successful"'
+
+      # 5. Deploy Laravel files using RSYNC
+      - name: Upload Laravel Code
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          rsync -avz \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='vendor/' \
+            --exclude='node_modules/' \
+            --exclude='storage/' \
+            --exclude='bootstrap/cache/' \
+            -e "ssh -i ~/.ssh/id_ed25519 -o BatchMode=yes -o StrictHostKeyChecking=yes" \
+            ./ \
+            "$EC2_USER@$EC2_HOST:/var/www/food_hub/"
+
+      # 6. Install Composer dependencies
+      - name: Composer Install
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$EC2_USER@$EC2_HOST" \
+            'cd /var/www/food_hub && composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader'
+
+      # 7. Run Laravel migrations
+      - name: Run Database Migrations
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$EC2_USER@$EC2_HOST" \
+            'cd /var/www/food_hub && php artisan migrate --force'
+
+      # 8. Clear Laravel caches
+      - name: Clear Laravel Cache
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$EC2_USER@$EC2_HOST" \
+            'cd /var/www/food_hub && php artisan optimize:clear'
+
+      # 9. Create storage link if missing
+      - name: Create Storage Link
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$EC2_USER@$EC2_HOST" \
+            'cd /var/www/food_hub && if [ ! -L public/storage ]; then php artisan storage:link; fi'
+
+      # 10. Optimize Laravel
+      - name: Optimize Laravel
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$EC2_USER@$EC2_HOST" \
+            'cd /var/www/food_hub && php artisan config:cache && php artisan view:cache'
+
+      # 11. Deployment completed
+      - name: Deployment Success
+        run: |
+          echo "Laravel deployment completed successfully!"
